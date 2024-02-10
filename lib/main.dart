@@ -1,3 +1,4 @@
+import 'package:expatrio_coding_challenge/widgets/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -8,7 +9,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,106 +28,68 @@ class MyApp extends StatelessWidget {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         colorScheme: ColorScheme.fromSwatch(
-                primarySwatch: createMaterialColor(Colors.white))
-            .copyWith(
+          primarySwatch: createMaterialColor(Colors.white),
+        ).copyWith(
           secondary: createMaterialColor(const Color.fromRGBO(65, 171, 158, 1)),
         ),
         primaryColorDark: Colors.white,
       ),
-      home: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              Image.asset(
-                'assets/2019_XP_logo_white.png',
-                height: 60,
+      home: const LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              bottom: 0,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: LottieBuilder.asset('assets/login-background.json'),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.email),
-                        SizedBox(width: 10),
-                        Text(
-                          'Email Address',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'john.doe@mail.com',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide(color: Colors.teal),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide(color: Colors.teal),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) =>
-                          FocusScope.of(context).nextFocus(),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Icon(Icons.lock),
-                        SizedBox(width: 10),
-                        Text(
-                          'Password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    TextFormField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your password',
-                        suffixIcon: Icon(Icons.visibility, color: Colors.teal),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide(color: Colors.teal),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide(color: Colors.teal),
-                        ),
-                      ),
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
+            ),
+            Column(
+              children: [
+                Image.asset(
+                  'assets/2019_XP_logo_white.png',
+                  height: 60,
+                ),
+                const SizedBox(height: 20),
+                const LoginForm(),
+                Expanded(child: Container()),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         // login functionality
                       },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.teal,
+                      icon: const Icon(
+                        Icons.help_outline,
+                        color: Colors.teal,
                       ),
-                      child: Text(
-                        'Login',
+                      label: const Text(
+                        'Help',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.teal,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              Expanded(child: Container()),
-              LottieBuilder.asset('assets/login-background.json'),
-            ],
-          ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ],
         ),
       ),
     );
