@@ -1,5 +1,7 @@
+import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:expatrio_coding_challenge/widgets/login_form.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 
 void main() {
@@ -11,6 +13,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ExpatrioApiService apiService = ExpatrioApiService();
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -34,13 +41,19 @@ class MyApp extends StatelessWidget {
         ),
         primaryColorDark: Colors.white,
       ),
-      home: const LoginPage(),
+      home: LoginPage(
+        apiService: apiService,
+      ),
     );
   }
 }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final ExpatrioApiService apiService;
+  const LoginPage({
+    Key? key,
+    required this.apiService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +75,9 @@ class LoginPage extends StatelessWidget {
                   height: 60,
                 ),
                 const SizedBox(height: 20),
-                const LoginForm(),
+                LoginForm(
+                  apiService: apiService,
+                ),
                 Expanded(child: Container()),
                 Align(
                   alignment: Alignment.centerLeft,

@@ -1,19 +1,140 @@
+import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  const LoginForm({Key? key, required this.apiService}) : super(key: key);
+
+  final ExpatrioApiService apiService;
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _isObscured = true;
 
   void _togglePasswordVisibility() {
     setState(() {
       _isObscured = !_isObscured;
     });
+  }
+
+  void _login() async {
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    try {
+      final Map<String, dynamic> loginResponse =
+          await widget.apiService.login(email, password);
+      // login success
+      debugPrint('login success');
+      _showLoginSuccessBottomSheet();
+    } catch (e) {
+      _showLoginErrorBottomSheet(e.toString());
+
+      debugPrint('login failed');
+    }
+  }
+
+  void _showLoginSuccessBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.check_circle,
+                color: Colors.teal,
+                size: 70,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Successfull Login',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'You will be redirected to your dashboard',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 150,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                  ),
+                  onPressed: () {},
+                  child: const Text('GOT IT'),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLoginErrorBottomSheet(String errorMessage) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error,
+                color: Colors.orange,
+                size: 70,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Invalid Credentials',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                errorMessage,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 150,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -34,6 +155,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 5),
           TextFormField(
+            controller: _emailController,
             decoration: InputDecoration(
               hintText: 'john.doe@mail.com',
               border: OutlineInputBorder(
@@ -61,6 +183,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 5),
           TextFormField(
+            controller: _passwordController,
             obscureText: _isObscured,
             decoration: InputDecoration(
               hintText: '********',
@@ -85,9 +208,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              // login functionality
-            },
+            onPressed: _login,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,
             ),
