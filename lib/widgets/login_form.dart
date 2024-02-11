@@ -1,4 +1,3 @@
-import 'package:expatrio_coding_challenge/models/account_info.dart';
 import 'package:expatrio_coding_challenge/pages/account_page.dart';
 import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +30,13 @@ class _LoginFormState extends State<LoginForm> {
     final String password = _passwordController.text.trim();
 
     try {
-      final AccountInfo accountInfo =
+      final Map<String, dynamic> loginResponse =
           await widget.apiService.login(email, password);
 
-      _showLoginSuccessBottomSheet(accountInfo);
+      final int userId = loginResponse['userId'] as int;
+      final String accessToken = loginResponse['accessToken'] as String;
+
+      _showLoginSuccessBottomSheet(userId, accessToken);
     } catch (e) {
       _showLoginErrorBottomSheet(e.toString());
 
@@ -42,14 +44,14 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  void _showLoginSuccessBottomSheet(AccountInfo accountInfo) {
+  void _showLoginSuccessBottomSheet(int userId, String accessToken) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
           height: 300,
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -84,8 +86,10 @@ class _LoginFormState extends State<LoginForm> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            AccountPage(accountInfo: accountInfo),
+                        builder: (context) => AccountPage(
+                          userId: userId,
+                          accessToken: accessToken,
+                        ),
                       ),
                     );
                   },

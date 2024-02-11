@@ -43,7 +43,7 @@ class LoginPage extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20),
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // login functionality
+                        // help functionality
                         debugPrint('Help button clicked');
                       },
                       icon: const Icon(
