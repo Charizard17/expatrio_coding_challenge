@@ -1,3 +1,5 @@
+import 'package:expatrio_coding_challenge/models/account_info.dart';
+import 'package:expatrio_coding_challenge/pages/account_page.dart';
 import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +31,10 @@ class _LoginFormState extends State<LoginForm> {
     final String password = _passwordController.text.trim();
 
     try {
-      final Map<String, dynamic> loginResponse =
+      final AccountInfo accountInfo =
           await widget.apiService.login(email, password);
-      // login success
-      debugPrint('login success');
-      _showLoginSuccessBottomSheet();
+
+      _showLoginSuccessBottomSheet(accountInfo);
     } catch (e) {
       _showLoginErrorBottomSheet(e.toString());
 
@@ -41,7 +42,7 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  void _showLoginSuccessBottomSheet() {
+  void _showLoginSuccessBottomSheet(AccountInfo accountInfo) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -78,7 +79,16 @@ class _LoginFormState extends State<LoginForm> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AccountPage(accountInfo: accountInfo),
+                      ),
+                    );
+                  },
                   child: const Text('GOT IT'),
                 ),
               )
@@ -94,9 +104,9 @@ class _LoginFormState extends State<LoginForm> {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          height: 300,
+          height: 350,
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -105,7 +115,7 @@ class _LoginFormState extends State<LoginForm> {
                 color: Colors.orange,
                 size: 70,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               const Text(
                 'Invalid Credentials',
                 textAlign: TextAlign.center,
@@ -129,7 +139,7 @@ class _LoginFormState extends State<LoginForm> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('OK'),
+                  child: const Text('GOT IT'),
                 ),
               )
             ],
