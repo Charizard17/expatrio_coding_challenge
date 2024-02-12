@@ -16,6 +16,15 @@ class UserTaxData {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'primaryTaxResidence': primaryTaxResidence.toJson(),
+      'secondaryTaxResidence': secondaryTaxResidences
+          ?.map((residence) => residence.toJson())
+          .toList(),
+    };
+  }
+
   UserTaxData copyWith({
     TaxResidence? primaryTaxResidence,
     List<TaxResidence>? secondaryTaxResidences,
@@ -42,5 +51,12 @@ class TaxResidence {
       countryCode: json['country'] as String,
       id: json['id'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'country': countryCode,
+      'id': id,
+    };
   }
 }

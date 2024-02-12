@@ -9,8 +9,10 @@ class UserTaxDataProvider extends ChangeNotifier {
 
   Future<void> updateUserTaxData(int userId, String accessToken) async {
     try {
-      final UserTaxData userTaxData =
-          await ExpatrioApiService().getUserTaxData(userId, accessToken);
+      final UserTaxData userTaxData = await ExpatrioApiService().getUserTaxData(
+        userId: userId,
+        accessToken: accessToken,
+      );
       _userTaxData = userTaxData;
       notifyListeners();
     } catch (e) {

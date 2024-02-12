@@ -90,6 +90,7 @@ class _LoginFormState extends State<LoginForm> {
                         builder: (context) => AccountPage(
                           userId: userId,
                           accessToken: accessToken,
+                          apiService: widget.apiService,
                         ),
                       ),
                     );

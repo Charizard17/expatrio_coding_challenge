@@ -1,4 +1,5 @@
 import 'package:expatrio_coding_challenge/providers/user_tax_data_provider.dart';
+import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:expatrio_coding_challenge/shared/countries_constants.dart';
 import 'package:expatrio_coding_challenge/widgets/tax_residence_details.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +9,13 @@ import 'package:provider/provider.dart';
 class AccountPage extends StatelessWidget {
   final int userId;
   final String accessToken;
+  final ExpatrioApiService apiService;
 
   const AccountPage({
     Key? key,
     required this.userId,
     required this.accessToken,
+    required this.apiService,
   }) : super(key: key);
 
   @override
@@ -161,6 +164,28 @@ class AccountPage extends StatelessWidget {
                       ),
                   ],
                 ),
+              ElevatedButton(
+                onPressed: () {
+                  apiService
+                      .updateTaxData(
+                        userId: userId,
+                        accessToken: accessToken,
+                        updatedTaxData: userTaxDataModel.userTaxData!,
+                      )
+                      .then(
+                        (value) => Navigator.of(context).pop(),
+                      );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                ),
+                child: const Text(
+                  'SAVE',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               const SizedBox(height: 50),
             ],
           ),

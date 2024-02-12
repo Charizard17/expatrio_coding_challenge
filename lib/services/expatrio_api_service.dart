@@ -39,10 +39,10 @@ class ExpatrioApiService {
     }
   }
 
-  Future<UserTaxData> getUserTaxData(
-    int userId,
-    String accessToken,
-  ) async {
+  Future<UserTaxData> getUserTaxData({
+    required int userId,
+    required String accessToken,
+  }) async {
     final Uri url = Uri.parse('$baseUrl/v3/customers/$userId/tax-data');
 
     try {
@@ -65,6 +65,36 @@ class ExpatrioApiService {
       }
     } catch (e) {
       throw Exception('Failed to fetch tax data: $e');
+    }
+  }
+
+  Future<void> updateTaxData({
+    required int userId,
+    required String accessToken,
+    required UserTaxData updatedTaxData,
+  }) async {
+    final Uri url = Uri.parse('$baseUrl/v3/customers/$userId/tax-data');
+
+    try {
+      final http.Response response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(updatedTaxData.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        print('Tax data updated successfully');
+      } else {
+        final Map<String, dynamic> errorData = jsonDecode(response.body);
+        final String errorMessage = errorData['message'] ??
+            'Failed to update tax data (${response.statusCode})';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      throw Exception('Failed to update tax data: $e');
     }
   }
 }
