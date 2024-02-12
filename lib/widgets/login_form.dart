@@ -8,6 +8,7 @@ class LoginForm extends StatefulWidget {
   final ExpatrioApiService apiService;
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginFormState createState() => _LoginFormState();
 }
 

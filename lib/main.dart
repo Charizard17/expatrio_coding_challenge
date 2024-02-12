@@ -1,10 +1,17 @@
 import 'package:expatrio_coding_challenge/pages/login_page.dart';
+import 'package:expatrio_coding_challenge/providers/user_tax_data_provider.dart';
 import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => UserTaxDataProvider(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

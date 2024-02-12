@@ -1,18 +1,19 @@
+import 'package:expatrio_coding_challenge/shared/countries_constants.dart';
 import 'package:flutter/material.dart';
 
 class TaxResidenceDetails extends StatelessWidget {
   final bool isPrimary;
-  final List<String> countries;
-  final String? selectedCountry;
-  final void Function(String)? onCountryChanged;
+  final String? countryCode;
+  final List<String> selectedCountryCodes;
+  final void Function(String?)? onCountryChanged;
   final String taxId;
   final void Function(String)? onTaxIdChanged;
 
   const TaxResidenceDetails({
     Key? key,
     required this.isPrimary,
-    required this.countries,
-    this.selectedCountry,
+    this.countryCode,
+    required this.selectedCountryCodes,
     this.onCountryChanged,
     required this.taxId,
     this.onTaxIdChanged,
@@ -39,7 +40,11 @@ class TaxResidenceDetails extends StatelessWidget {
               builder: (BuildContext context) {
                 return _buildBottomSheet(context);
               },
-            );
+            ).then((selectedCountry) {
+              if (selectedCountry != null) {
+                onCountryChanged?.call(selectedCountry);
+              }
+            });
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -51,7 +56,9 @@ class TaxResidenceDetails extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  selectedCountry ?? 'Select Country',
+                  countryCode != null
+                      ? CountriesConstants.getCountryLabelFromCode(countryCode!)
+                      : 'Select Country',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const Icon(Icons.arrow_drop_down),
@@ -86,6 +93,9 @@ class TaxResidenceDetails extends StatelessWidget {
   }
 
   Widget _buildBottomSheet(BuildContext context) {
+    final List<String> countries = CountriesConstants.getCountryLabels(
+      selectedCountryCodes,
+    );
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(20),

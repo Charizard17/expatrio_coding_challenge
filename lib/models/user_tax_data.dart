@@ -15,20 +15,31 @@ class UserTaxData {
           .toList(),
     );
   }
+
+  UserTaxData copyWith({
+    TaxResidence? primaryTaxResidence,
+    List<TaxResidence>? secondaryTaxResidences,
+  }) {
+    return UserTaxData(
+      primaryTaxResidence: primaryTaxResidence ?? this.primaryTaxResidence,
+      secondaryTaxResidences:
+          secondaryTaxResidences ?? this.secondaryTaxResidences,
+    );
+  }
 }
 
 class TaxResidence {
-  final String country;
+  final String countryCode;
   final String id;
 
   TaxResidence({
-    required this.country,
+    required this.countryCode,
     required this.id,
   });
 
   factory TaxResidence.fromJson(Map<String, dynamic> json) {
     return TaxResidence(
-      country: json['country'] as String,
+      countryCode: json['country'] as String,
       id: json['id'] as String,
     );
   }
