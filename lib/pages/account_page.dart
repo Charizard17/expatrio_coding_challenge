@@ -1,5 +1,7 @@
-import 'package:expatrio_coding_challenge/models/user_tax_data.dart';
+import 'package:expatrio_coding_challenge/shared/countries_constants.dart';
+import 'package:expatrio_coding_challenge/widgets/tax_residence_details.dart';
 import 'package:flutter/material.dart';
+import 'package:expatrio_coding_challenge/models/user_tax_data.dart';
 import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -19,54 +21,56 @@ class AccountPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Account Info'),
       ),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/CryingGirl.svg',
-              height: 200,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Uh-Oh!',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/CryingGirl.svg',
+                height: 200,
               ),
-            ),
-            const SizedBox(
-              width: 180,
-              child: Text(
-                'We need your tax data in order to access your account',
-                textAlign: TextAlign.center,
+              const SizedBox(height: 20),
+              const Text(
+                'Uh-Oh!',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _openBottomSheet(
-                  context,
-                  userId,
-                  accessToken,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-              ),
-              child: const Text(
-                'UPDATE YOUR TAX DATA',
-                style: TextStyle(
-                  color: Colors.white,
+              const SizedBox(
+                width: 180,
+                child: Text(
+                  'We need your tax data in order to access your account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _openBottomSheet(
+                    context,
+                    userId,
+                    accessToken,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                ),
+                child: const Text(
+                  'UPDATE YOUR TAX DATA',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -79,6 +83,7 @@ class AccountPage extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
         return FutureBuilder<UserTaxData>(
           future: ExpatrioApiService().getUserTaxData(
@@ -94,61 +99,62 @@ class AccountPage extends StatelessWidget {
                 final secondaryTaxResidences =
                     snapshot.data!.secondaryTaxResidences;
 
-                return FractionallySizedBox(
-                  heightFactor: 1.0,
-                  widthFactor: 1.0,
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Declaration of Financial Information',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 50),
+                          const Text(
+                            'Declaration of Financial Information',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Primary Tax Residence:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 20),
+                          TaxResidenceDetails(
+                            isPrimary: true,
+                            countries: CountriesConstants.nationality
+                                .map((country) => country['label'].toString())
+                                .toList(),
+                            selectedCountry: primaryTaxResidence.country,
+                            onCountryChanged: (value) {
+                              // Handle country change
+                            },
+                            taxId: primaryTaxResidence.id,
+                            onTaxIdChanged: (value) {
+                              // Handle tax ID change
+                            },
                           ),
-                        ),
-                        Text(
-                          'Country: ${primaryTaxResidence.country}',
-                        ),
-                        Text(
-                          'ID: ${primaryTaxResidence.id}',
-                        ),
-                        const SizedBox(height: 10),
-                        if (secondaryTaxResidences != null &&
-                            secondaryTaxResidences.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Secondary Tax Residences:',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              for (var residence in secondaryTaxResidences)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Country: ${residence.country}',
-                                    ),
-                                    Text(
-                                      'ID: ${residence.id}',
-                                    ),
-                                    const SizedBox(height: 10),
-                                  ],
-                                ),
-                            ],
-                          ),
-                      ],
+                          if (secondaryTaxResidences != null &&
+                              secondaryTaxResidences.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var residence in secondaryTaxResidences)
+                                  TaxResidenceDetails(
+                                    isPrimary: false,
+                                    countries: CountriesConstants.nationality
+                                        .map((country) =>
+                                            country['label'].toString())
+                                        .toList(),
+                                    selectedCountry: residence.country,
+                                    onCountryChanged: (value) {
+                                      // Handle country change
+                                    },
+                                    taxId: residence.id,
+                                    onTaxIdChanged: (value) {
+                                      // Handle tax ID change
+                                    },
+                                  ),
+                              ],
+                            ),
+                          const SizedBox(height: 50),
+                        ],
+                      ),
                     ),
                   ),
                 );
