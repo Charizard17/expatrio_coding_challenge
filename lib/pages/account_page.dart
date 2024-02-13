@@ -99,98 +99,159 @@ class AccountPage extends StatelessWidget {
   }
 
   Widget _buildBottomSheet(
-      BuildContext context, UserTaxDataProvider userTaxDataModel) {
+    BuildContext context,
+    UserTaxDataProvider userTaxDataModel,
+  ) {
     final userTaxData = userTaxDataModel.userTaxData!;
+    bool isCheckboxChecked = false;
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
-              const Text(
-                'Declaration of Financial Information',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TaxResidenceDetails(
-                isPrimary: true,
-                countryCode: userTaxData.primaryTaxResidence.countryCode,
-                selectedCountryCodes:
-                    userTaxDataModel.getSelectedCountryCodes(),
-                onCountryChanged: (value) {
-                  final String countryCode =
-                      CountriesConstants.getCountryCodeFromLabel(value!);
-                  userTaxDataModel
-                      .updatePrimaryTaxResidenceCountry(countryCode);
-                },
-                taxId: userTaxData.primaryTaxResidence.id,
-                onTaxIdChanged: (value) {
-                  userTaxDataModel.updatePrimaryTaxId(value);
-                },
-              ),
-              if (userTaxData.secondaryTaxResidences != null &&
-                  userTaxData.secondaryTaxResidences!.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var residence in userTaxData.secondaryTaxResidences!)
-                      TaxResidenceDetails(
-                        isPrimary: false,
-                        countryCode: residence.countryCode,
-                        selectedCountryCodes:
-                            userTaxDataModel.getSelectedCountryCodes(),
-                        onCountryChanged: (value) {
-                          final String countryCode =
-                              CountriesConstants.getCountryCodeFromLabel(
-                                  value!);
-                          userTaxDataModel.updateSecondaryTaxResidences(
-                            residence,
-                            countryCode,
-                          );
-                        },
-                        taxId: residence.id,
-                        onTaxIdChanged: (value) {
-                          userTaxDataModel.updateSecondaryTaxId(
-                            residence,
-                            value,
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ElevatedButton(
-                onPressed: () {
-                  apiService
-                      .updateTaxData(
-                        userId: userId,
-                        accessToken: accessToken,
-                        updatedTaxData: userTaxDataModel.userTaxData!,
-                      )
-                      .then(
-                        (value) => Navigator.of(context).pop(),
-                      );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                ),
-                child: const Text(
-                  'SAVE',
+    return StatefulBuilder(builder: (context, setState) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 50),
+                const Text(
+                  'Declaration of Financial Information',
                   style: TextStyle(
-                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              const SizedBox(height: 50),
-            ],
+                const SizedBox(height: 20),
+                TaxResidenceDetails(
+                  isPrimary: true,
+                  countryCode: userTaxData.primaryTaxResidence.countryCode,
+                  selectedCountryCodes:
+                      userTaxDataModel.getSelectedCountryCodes(),
+                  onCountryChanged: (value) {
+                    final String countryCode =
+                        CountriesConstants.getCountryCodeFromLabel(value!);
+                    userTaxDataModel
+                        .updatePrimaryTaxResidenceCountry(countryCode);
+                  },
+                  taxId: userTaxData.primaryTaxResidence.id,
+                  onTaxIdChanged: (value) {
+                    userTaxDataModel.updatePrimaryTaxId(value);
+                  },
+                ),
+                if (userTaxData.secondaryTaxResidences != null &&
+                    userTaxData.secondaryTaxResidences!.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var residence in userTaxData.secondaryTaxResidences!)
+                        TaxResidenceDetails(
+                          isPrimary: false,
+                          countryCode: residence.countryCode,
+                          selectedCountryCodes:
+                              userTaxDataModel.getSelectedCountryCodes(),
+                          onCountryChanged: (value) {
+                            final String countryCode =
+                                CountriesConstants.getCountryCodeFromLabel(
+                                    value!);
+                            userTaxDataModel.updateSecondaryTaxResidences(
+                              residence,
+                              countryCode,
+                            );
+                          },
+                          onTaxResidenceRemoved: () {
+                            userTaxDataModel.removeSecondaryTaxResidence(
+                              residence,
+                            );
+                          },
+                          taxId: residence.id,
+                          onTaxIdChanged: (value) {
+                            userTaxDataModel.updateSecondaryTaxId(
+                              residence,
+                              value,
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      userTaxDataModel.addSecondaryTaxResidence();
+                    },
+                    child: const Text(
+                      '+ ADD ANOTHER',
+                      style: TextStyle(
+                        color: Colors.teal,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                if (userTaxDataModel.isTaxResidenceDataEmpty())
+                  const Column(children: [
+                    Text(
+                      "PLEASE CHECK ALL TAX RESIDENCES AND IDS",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                  ]),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: isCheckboxChecked,
+                      side: BorderSide(
+                        color: isCheckboxChecked ? Colors.teal : Colors.red,
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          isCheckboxChecked = value!;
+                        });
+                      },
+                      activeColor: Colors.teal,
+                      checkColor: Colors.white,
+                    ),
+                    const SizedBox(
+                      width: 260,
+                      child: Text(
+                        'I confirm above tax residency and US self-declaration is true and accurate.',
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (isCheckboxChecked &&
+                        !(userTaxDataModel.isTaxResidenceDataEmpty())) {
+                      apiService
+                          .updateTaxData(
+                            userId: userId,
+                            accessToken: accessToken,
+                            updatedTaxData: userTaxDataModel.userTaxData!,
+                          )
+                          .then((value) => Navigator.of(context).pop());
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    minimumSize: const Size(150, 35),
+                  ),
+                  child: const Text(
+                    'SAVE',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

@@ -7,6 +7,9 @@ class CountriesConstants {
   }
 
   static String getCountryLabelFromCode(String code) {
+    if (code == '') {
+      return '';
+    }
     return CountriesConstants.nationality
         .firstWhere((country) => country['code'].toString() == code)['label']
         .toString();

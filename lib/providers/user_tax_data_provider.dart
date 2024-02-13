@@ -95,6 +95,54 @@ class UserTaxDataProvider extends ChangeNotifier {
     }
   }
 
+  void addSecondaryTaxResidence() {
+    if (_userTaxData != null) {
+      final newResidence = TaxResidence(countryCode: '', id: '');
+      final updatedSecondaryResidences = List<TaxResidence>.from(
+        _userTaxData!.secondaryTaxResidences ?? [],
+      )..add(newResidence);
+
+      _userTaxData = _userTaxData!.copyWith(
+        secondaryTaxResidences: updatedSecondaryResidences,
+      );
+
+      notifyListeners();
+    }
+  }
+
+  void removeSecondaryTaxResidence(TaxResidence residenceToRemove) {
+    if (_userTaxData != null) {
+      final updatedSecondaryResidences =
+          _userTaxData!.secondaryTaxResidences?.where((residence) {
+        return residence != residenceToRemove;
+      }).toList();
+
+      _userTaxData = _userTaxData!.copyWith(
+        secondaryTaxResidences: updatedSecondaryResidences,
+      );
+
+      notifyListeners();
+    }
+  }
+
+  bool isTaxResidenceDataEmpty() {
+    if (_userTaxData != null) {
+      if (_userTaxData!.primaryTaxResidence.countryCode.isEmpty ||
+          _userTaxData!.primaryTaxResidence.id.isEmpty) {
+        return true;
+      }
+
+      if (_userTaxData!.secondaryTaxResidences != null) {
+        for (var residence in _userTaxData!.secondaryTaxResidences!) {
+          if (residence.countryCode.isEmpty || residence.id.isEmpty) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   List<String> getSelectedCountryCodes() {
     final List<String> countryCodes = [];
 
