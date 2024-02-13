@@ -1,11 +1,16 @@
+import 'package:expatrio_coding_challenge/models/user_tax_data.dart';
 import 'package:expatrio_coding_challenge/services/expatrio_api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:expatrio_coding_challenge/models/user_tax_data.dart';
 
 class UserTaxDataProvider extends ChangeNotifier {
   UserTaxData? _userTaxData;
 
   UserTaxData? get userTaxData => _userTaxData;
+
+  set userTaxData(UserTaxData? newUserTaxData) {
+    _userTaxData = newUserTaxData;
+    notifyListeners();
+  }
 
   Future<void> updateUserTaxData(int userId, String accessToken) async {
     try {
@@ -16,14 +21,14 @@ class UserTaxDataProvider extends ChangeNotifier {
       _userTaxData = userTaxData;
       notifyListeners();
     } catch (e) {
-      Exception('Error fetching user tax data: $e');
+      debugPrint('Error fetching user tax data: $e');
     }
   }
 
   void updatePrimaryTaxResidenceCountry(String country) {
     if (_userTaxData != null) {
-      final updatedPrimaryTaxResidence = TaxResidence(
-        id: _userTaxData!.primaryTaxResidence.id,
+      final updatedPrimaryTaxResidence =
+          _userTaxData!.primaryTaxResidence.copyWith(
         countryCode: country,
       );
 
@@ -40,14 +45,9 @@ class UserTaxDataProvider extends ChangeNotifier {
     if (_userTaxData != null) {
       final updatedSecondaryResidences =
           _userTaxData!.secondaryTaxResidences?.map((residence) {
-        if (residence == previousResidence) {
-          return TaxResidence(
-            id: residence.id,
-            countryCode: updatedCountryCode,
-          );
-        } else {
-          return residence;
-        }
+        return residence == previousResidence
+            ? residence.copyWith(countryCode: updatedCountryCode)
+            : residence;
       }).toList();
 
       _userTaxData = _userTaxData!.copyWith(
@@ -60,9 +60,9 @@ class UserTaxDataProvider extends ChangeNotifier {
 
   void updatePrimaryTaxId(String newTaxId) {
     if (_userTaxData != null) {
-      final updatedPrimaryTaxResidence = TaxResidence(
+      final updatedPrimaryTaxResidence =
+          _userTaxData!.primaryTaxResidence.copyWith(
         id: newTaxId,
-        countryCode: _userTaxData!.primaryTaxResidence.countryCode,
       );
 
       _userTaxData = _userTaxData!.copyWith(
@@ -77,14 +77,9 @@ class UserTaxDataProvider extends ChangeNotifier {
     if (_userTaxData != null) {
       final updatedSecondaryResidences =
           _userTaxData!.secondaryTaxResidences?.map((existingResidence) {
-        if (existingResidence == residence) {
-          return TaxResidence(
-            id: newTaxId,
-            countryCode: existingResidence.countryCode,
-          );
-        } else {
-          return existingResidence;
-        }
+        return existingResidence == residence
+            ? existingResidence.copyWith(id: newTaxId)
+            : existingResidence;
       }).toList();
 
       _userTaxData = _userTaxData!.copyWith(
@@ -132,13 +127,9 @@ class UserTaxDataProvider extends ChangeNotifier {
         return true;
       }
 
-      if (_userTaxData!.secondaryTaxResidences != null) {
-        for (var residence in _userTaxData!.secondaryTaxResidences!) {
-          if (residence.countryCode.isEmpty || residence.id.isEmpty) {
-            return true;
-          }
-        }
-      }
+      return _userTaxData!.secondaryTaxResidences?.any((residence) =>
+              residence.countryCode.isEmpty || residence.id.isEmpty) ??
+          false;
     }
     return false;
   }

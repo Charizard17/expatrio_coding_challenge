@@ -59,4 +59,14 @@ class TaxResidence {
       'id': id,
     };
   }
+
+  TaxResidence copyWith({
+    String? id,
+    String? countryCode,
+  }) {
+    return TaxResidence(
+      id: id ?? this.id,
+      countryCode: countryCode ?? this.countryCode,
+    );
+  }
 }
